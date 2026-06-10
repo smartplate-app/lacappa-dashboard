@@ -126,6 +126,23 @@ body.light .item-row{border-bottom-color:rgba(0,0,0,0.06);}
 .tag.alcohol{background:rgba(245,158,11,0.2);color:#f59e0b;}
 .tag.other{background:rgba(148,163,184,0.15);color:#94a3b8;}
 
+
+.search-sort-bar{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+.search-input{flex:1;min-width:160px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:white;padding:9px 14px;border-radius:10px;font-size:13px;font-family:inherit;outline:none;direction:rtl;}
+.search-input::placeholder{color:rgba(255,255,255,0.3);}
+.search-input:focus{border-color:rgba(192,132,252,0.5);background:rgba(192,132,252,0.08);}
+body.light .search-input{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.12);color:#1a0a2e;}
+body.light .search-input::placeholder{color:rgba(0,0,0,0.3);}
+body.light .search-input:focus{border-color:rgba(139,92,246,0.4);background:rgba(139,92,246,0.06);}
+.sort-btn{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.6);padding:9px 14px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all 0.2s;}
+.sort-btn.active{background:rgba(192,132,252,0.15);border-color:rgba(192,132,252,0.4);color:#c084fc;}
+body.light .sort-btn{background:rgba(0,0,0,0.05);border-color:rgba(0,0,0,0.12);color:rgba(0,0,0,0.5);}
+body.light .sort-btn.active{background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.35);color:#7c3aed;}
+.results-count{font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:8px;}
+body.light .results-count{color:rgba(0,0,0,0.35);}
+.no-results{text-align:center;padding:30px;color:rgba(255,255,255,0.3);font-size:13px;}
+body.light .no-results{color:rgba(0,0,0,0.3);}
+
 .footer{text-align:center;padding:20px 0 8px;}
 .footer-txt{font-size:10px;color:rgba(255,255,255,0.2);}
 </style>
@@ -394,11 +411,119 @@ function toggleTheme(){
   }
 })();
 
+
+// All items (full list for search/sort)
+var ALL_ITEMS = [
+  {name:"\u05e4\u05d9\u05e6\u05d4",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:520,rev:67559.72,pct:41.3},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05de\u05e8\u05d2\u05e8\u05d9\u05d8\u05d4 M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:219,rev:12826,pct:7.8},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05d1\u05d9\u05d9\u05e7\u05d5\u05df \u05d0\u05e8\u05d1\u05e2 \u05d2\u05d1\u05d9\u05e0\u05d5\u05ea M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:110,rev:7709.9,pct:4.7},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05e4\u05e4\u05e8\u05d5\u05e0\u05d9 M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:91,rev:6144,pct:3.8},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05d0\u05e8\u05d8\u05d9\u05e9\u05d5\u05e7 M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:72,rev:4022,pct:2.5},
+  {name:"\u05e1\u05d5\u05e4\u05dc\u05d9 \u05e7\u05dc\u05d0\u05e1\u05d9",cat:"\u05e8\u05d0\u05e9\u05d5\u05e0\u05d5\u05ea",qty:196,rev:2352,pct:1.4},
+  {name:"\u05e7\u05d5\u05e7\u05d4 \u05e7\u05d5\u05dc\u05d4",cat:"\u05e9\u05ea\u05d9\u05d9\u05d4 \u05e7\u05dc\u05d4",qty:128,rev:1536,pct:0.9},
+  {name:"\u05e7\u05d5\u05e7\u05d4 \u05e7\u05d5\u05dc\u05d4 \u05d6\u05d9\u05e8\u05d5",cat:"\u05e9\u05ea\u05d9\u05d9\u05d4 \u05e7\u05dc\u05d4",qty:83,rev:996,pct:0.6},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05e1\u05d8\u05e8\u05e6\u05d9\u05d0\u05d8\u05dc\u05d4 M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:52,rev:3605,pct:2.2},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05e4\u05e4\u05e8\u05d5\u05e0\u05d9 \u05d7\u05e8\u05d9\u05e3 M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:54,rev:3158,pct:1.9},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05ea\u05e4\u05d5\u05d7 \u05d0\u05d3\u05de\u05d4 M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:58,rev:3127.5,pct:1.9},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05d1\u05d8\u05d8\u05d4 \u05e4\u05e1\u05d8\u05d5 M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:54,rev:3000,pct:1.8},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05e4\u05d8\u05e8\u05d9\u05d5\u05ea \u05dc\u05d1\u05e0\u05d4 M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:39,rev:2567,pct:1.6},
+  {name:"\u05d0\u05e1\u05d8\u05e8\u05d9\u05d4 \u05d3\u05d0\u05d0\u05dd",cat:"\u05d0\u05dc\u05db\u05d5\u05d4\u05d5\u05dc",qty:67,rev:1608,pct:1.0},
+  {name:"\u05e1\u05d5\u05d3\u05d4",cat:"\u05e9\u05ea\u05d9\u05d9\u05d4 \u05e7\u05dc\u05d4",qty:56,rev:560,pct:0.3},
+  {name:"\u05e4\u05d9\u05d5\u05d6\u05d8\u05d9",cat:"\u05e9\u05ea\u05d9\u05d9\u05d4 \u05e7\u05dc\u05d4",qty:45,rev:540,pct:0.3},
+  {name:"\u05de\u05d0\u05e6\u05d9 \u05e8\u05d5\u05d6\u05d4",cat:"\u05e4\u05e1\u05d8\u05d4",qty:43,rev:2322,pct:1.4},
+  {name:"\u05de\u05e8\u05d9\u05d8\u05d5\u05e6\u05d5",cat:"\u05e7\u05d9\u05e0\u05d5\u05d7\u05d9\u05dd",qty:43,rev:454,pct:0.3},
+  {name:"\u05e1\u05dc\u05d8 \u05d7\u05e1\u05d4 \u05e7\u05d9\u05e1\u05e8",cat:"\u05e1\u05dc\u05d8\u05d9\u05dd",qty:42,rev:2024,pct:1.2},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05d7\u05e6\u05d9\u05dc\u05d9\u05dd M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:41,rev:2110,pct:1.3},
+  {name:"\u05e1\u05dc\u05d8 \u05e4\u05e0\u05e6\u05e0\u05dc\u05d4",cat:"\u05e1\u05dc\u05d8\u05d9\u05dd",qty:39,rev:2262,pct:1.4},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05e4\u05d8\u05e8\u05d9\u05d5\u05ea \u05d1\u05e6\u05dc M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:37,rev:2086,pct:1.3},
+  {name:"\u05de\u05d9\u05dd \u05de\u05d9\u05e0\u05e8\u05dc\u05d9\u05dd",cat:"\u05e9\u05ea\u05d9\u05d9\u05d4 \u05e7\u05dc\u05d4",qty:35,rev:420,pct:0.3},
+  {name:"\u05e1\u05e4\u05e8\u05d9\u05d9\u05d8 \u05d6\u05d9\u05e8\u05d5",cat:"\u05e9\u05ea\u05d9\u05d9\u05d4 \u05e7\u05dc\u05d4",qty:36,rev:432,pct:0.3},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05e4\u05d8\u05e8\u05d9\u05d5\u05ea M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:36,rev:1970,pct:1.2},
+  {name:"\u05de\u05d0\u05e6\u05d9 \u05e8\u05d5\u05d6\u05d4 \u05d5\u05d1\u05d9\u05d9\u05e7\u05d5\u05df",cat:"\u05e4\u05e1\u05d8\u05d4",qty:33,rev:2118,pct:1.3},
+  {name:"\u05e4\u05d5\u05e7\u05e6\u0027\u05d4 \u05de\u05d8\u05d1\u05dc\u05d9\u05dd",cat:"\u05e8\u05d0\u05e9\u05d5\u05e0\u05d5\u05ea",qty:33,rev:1056,pct:0.6},
+  {name:"\u05e4\u05d8\u05d5\u05e6\u05d9\u05e0\u05d9 \u05e9\u05de\u05e0\u05ea \u05e4\u05d8\u05e8\u05d9\u05d5\u05ea",cat:"\u05e4\u05e1\u05d8\u05d4",qty:32,rev:1799,pct:1.1},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05d0\u05e0\u05e9\u05d5\u05d1\u05d9 \u05d0\u05d5\u05e8\u05d8\u05d9\u05d6 M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:31,rev:2069,pct:1.3},
+  {name:"\u05ea\u05e4\u05d5\u05d6\u05d9\u05dd",cat:"\u05e9\u05ea\u05d9\u05d9\u05d4 \u05e7\u05dc\u05d4",qty:31,rev:372,pct:0.2},
+  {name:"\u05de\u05d0\u05dc\u05d8\u05d9",cat:"\u05e9\u05ea\u05d9\u05d9\u05d4 \u05e7\u05dc\u05d4",qty:30,rev:360,pct:0.2},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05e7\u05dc\u05de\u05d8\u05d4 M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:29,rev:1657,pct:1.0},
+  {name:"3 \u05d9\u05d7 \u05e1\u05d5\u05e4\u05dc\u05d9 \u05e7\u05dc\u05d0\u05e1\u05d9",cat:"\u05e8\u05d0\u05e9\u05d5\u05e0\u05d5\u05ea",qty:27,rev:1215,pct:0.7},
+  {name:"\u05e2\u05e0\u05d1\u05d9\u05dd",cat:"\u05e9\u05ea\u05d9\u05d9\u05d4 \u05e7\u05dc\u05d4",qty:27,rev:324,pct:0.2},
+  {name:"\u05e4\u05d5\u05e7\u05e6\u0027\u05d4",cat:"\u05e8\u05d0\u05e9\u05d5\u05e0\u05d5\u05ea",qty:27,rev:690,pct:0.4},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05d1\u05e6\u05dc\u05d9\u05dd M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:26,rev:1433,pct:0.9},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05d7\u05e8\u05d9\u05e4\u05d4 \u05d0\u05e9 M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:26,rev:1322.5,pct:0.8},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05e7\u05d5\u05e8\u05e0\u05d1\u05d9\u05e3 M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:25,rev:1360,pct:0.8},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05d0\u05e8\u05d1\u05e2 \u05d2\u05d1\u05d9\u05e0\u05d5\u05ea M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:20,rev:1094,pct:0.7},
+  {name:"\u05e4\u05d8\u05d5\u05e6\u05d9\u05e0\u05d9 \u05e2\u05d2\u05d1\u05e0\u05d9\u05d5\u05ea",cat:"\u05e4\u05e1\u05d8\u05d4",qty:19,rev:994,pct:0.6},
+  {name:"\u05d1\u05e8\u05d9\u05d5\u05e9 \u05e9\u05d5\u05dd",cat:"\u05e8\u05d0\u05e9\u05d5\u05e0\u05d5\u05ea",qty:18,rev:684,pct:0.4},
+  {name:"\u05e4\u05d0\u05e0\u05d8\u05d4",cat:"\u05e9\u05ea\u05d9\u05d9\u05d4 \u05e7\u05dc\u05d4",qty:17,rev:199.2,pct:0.1},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05e4\u05e4\u05e8\u05d5\u05e0\u05d9 \u05dc\u05d1\u05df \u05d5\u05e1\u05d8\u05e8\u05e6\u05d9\u05d0\u05d8\u05dc\u05d4 M",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:17,rev:1130,pct:0.7},
+  {name:"\u05d0\u05e9\u05db\u05d5\u05dc\u05d9\u05d5\u05ea",cat:"\u05e9\u05ea\u05d9\u05d9\u05d4 \u05e7\u05dc\u05d4",qty:16,rev:192,pct:0.1},
+  {name:"\u05e0\u05d9\u05d5\u05e7\u05d9 \u05e4\u05d8\u05e8\u05d9\u05d5\u05ea \u05db\u05de\u05d4\u05d9\u05df",cat:"\u05e4\u05e1\u05d8\u05d4",qty:14,rev:868,pct:0.5},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05de\u05e8\u05d2\u05e8\u05d9\u05d8\u05d4 L",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:13,rev:680,pct:0.4},
+  {name:"\u05e0\u05d9\u05d5\u05e7\u05d9 \u05e8\u05d5\u05d6\u05d4",cat:"\u05e4\u05e1\u05d8\u05d4",qty:13,rev:760,pct:0.5},
+  {name:"\u05e1\u05dc\u05d8 \u05d7\u05e1\u05d4 \u05dc\u05d0\u05dc\u05d9\u05e7 \u05d5\u05d0\u05e8\u05d8\u05d9\u05e9\u05d5\u05e7",cat:"\u05e1\u05dc\u05d8\u05d9\u05dd",qty:13,rev:754,pct:0.5},
+  {name:"\u05ea\u05d5\u05ea \u05d1\u05e0\u05e0\u05d4",cat:"\u05e9\u05ea\u05d9\u05d9\u05d4 \u05e7\u05dc\u05d4",qty:11,rev:132,pct:0.1},
+  {name:"\u05de\u05d0\u05e6\u05d9 \u05e9\u05de\u05e0\u05ea \u05e4\u05e1\u05d8\u05d5",cat:"\u05e4\u05e1\u05d8\u05d4",qty:8,rev:496,pct:0.3},
+  {name:"\u05ea\u05e4\u05d5\u05d7\u05d9\u05dd",cat:"\u05e9\u05ea\u05d9\u05d9\u05d4 \u05e7\u05dc\u05d4",qty:8,rev:96,pct:0.1},
+  {name:"\u05dc\u05d9\u05de\u05d5\u05e0\u05e2\u05e0\u05e2",cat:"\u05e9\u05ea\u05d9\u05d9\u05d4 \u05e7\u05dc\u05d4",qty:7,rev:84,pct:0.1},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05e4\u05e4\u05e8\u05d5\u05e0\u05d9 L",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:6,rev:640,pct:0.4},
+  {name:"\u05e4\u05d8\u05d5\u05e6\u0027\u05d9\u05e0\u05d9 \u05d0\u05e8\u05d1\u05d9\u05d0\u05d8\u05d4",cat:"\u05e4\u05e1\u05d8\u05d4",qty:4,rev:216,pct:0.1},
+  {name:"\u05e4\u05d9\u05e8\u05d5\u05e0\u05d9",cat:"\u05d0\u05dc\u05db\u05d5\u05d4\u05d5\u05dc",qty:4,rev:72,pct:0.0},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05d1\u05d8\u05d8\u05d4 \u05e4\u05e1\u05d8\u05d5 L",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:3,rev:304,pct:0.2},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05e1\u05d8\u05e8\u05e6\u05d9\u05d0\u05d8\u05dc\u05d4 L",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:3,rev:248,pct:0.2},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05e7\u05dc\u05de\u05d8\u05d4 L",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:3,rev:188,pct:0.2},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05d0\u05e8\u05d1\u05e2 \u05d2\u05d1\u05d9\u05e0\u05d5\u05ea L",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:2,rev:208,pct:0.1},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05e4\u05d8\u05e8\u05d9\u05d5\u05ea \u05d1\u05e6\u05dc L",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:2,rev:192,pct:0.1},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05e7\u05d5\u05e8\u05e0\u05d1\u05d9\u05e3 L",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:2,rev:208,pct:0.1},
+  {name:"\u05e4\u05d9\u05e6\u05d4 \u05ea\u05e4\u05d5\u05d7 \u05d0\u05d3\u05de\u05d4 L",cat:"\u05e4\u05d9\u05e6\u05d5\u05ea",qty:2,rev:96,pct:0.1}
+];
+
+var currentSort = "rev";
+
+function setSort(s){
+  currentSort = s;
+  document.getElementById("sort-rev").classList.toggle("active", s==="rev");
+  document.getElementById("sort-qty").classList.toggle("active", s==="qty");
+  filterItems();
+}
+
+function filterItems(){
+  var q = (document.getElementById("search-input").value||"").toLowerCase().trim();
+  var filtered = ALL_ITEMS.filter(function(i){
+    return !q || i.name.toLowerCase().indexOf(q) !== -1 || i.cat.toLowerCase().indexOf(q) !== -1;
+  });
+  filtered.sort(function(a,b){ return currentSort==="qty" ? b.qty-a.qty : b.rev-a.rev; });
+  
+  var maxVal = filtered.length ? (currentSort==="qty" ? filtered[0].qty : filtered[0].rev) : 1;
+  var countEl = document.getElementById("results-count");
+  if(countEl) countEl.textContent = filtered.length + " \u05e4\u05e8\u05d9\u05d8\u05d9\u05dd";
+  
+  var el = document.getElementById("top15-list");
+  if(!filtered.length){
+    el.innerHTML = '<div class="no-results">\u05dc\u05d0 \u05e0\u05de\u05e6\u05d0\u05d5 \u05e4\u05e8\u05d9\u05d8\u05d9\u05dd</div>';
+    return;
+  }
+  var html = "";
+  filtered.forEach(function(item,i){
+    var val = currentSort==="qty" ? item.qty : item.rev;
+    var w = val/maxVal*100;
+    var badge = currentSort==="qty" ? item.qty+" \u05d9\u05d7'" : item.pct+"%";
+    html += '<div class="item-row">';
+    html += '<div class="item-rank '+rc(i)+'">'+(i+1)+'</div>';
+    html += '<div class="item-info"><div class="item-name">'+item.name+'</div>'+catTag(item.cat)+'<div class="item-qty">'+item.qty+" \u05d9\u05d7' | "+fmt(item.rev)+'</div></div>';
+    html += '<div style="flex:1;padding:0 10px;"><div class="item-bar"><div class="item-bar-fill" style="width:'+w+'%;background:linear-gradient(90deg,#7c3aed,#c084fc)"></div></div></div>';
+    html += '<div class="item-nums"><div class="item-rev">'+(currentSort==="qty"?item.qty+" \u05d9\u05d7'":fmt(item.rev))+'</div><span class="item-pct-badge">'+badge+'</span></div>';
+    html += '</div>';
+  });
+  el.innerHTML = html;
+}
+
 renderList(TOP15.slice(0,5),"top5-list","linear-gradient(90deg,#7c3aed,#c084fc)");
-renderList(TOP15,"top15-list","linear-gradient(90deg,#7c3aed,#c084fc)");
+filterItems();
 renderCatBars();
 renderList(PIZZA,"pizza-breakdown","linear-gradient(90deg,#6d28d9,#c084fc)");
 renderList(OTHER,"other-breakdown","linear-gradient(90deg,#d97706,#fbbf24)");
+
 </script>
 </body>
 </html>
