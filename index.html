@@ -488,7 +488,8 @@ function setSort(s){
 }
 
 function filterItems(){
-  var q = (document.getElementById("search-input").value||"").toLowerCase().trim();
+  var searchEl = document.getElementById("search-input");
+  var q = searchEl ? searchEl.value.toLowerCase().trim() : "";
   var filtered = ALL_ITEMS.filter(function(i){
     return !q || i.name.toLowerCase().indexOf(q) !== -1 || i.cat.toLowerCase().indexOf(q) !== -1;
   });
@@ -496,23 +497,24 @@ function filterItems(){
   
   var maxVal = filtered.length ? (currentSort==="qty" ? filtered[0].qty : filtered[0].rev) : 1;
   var countEl = document.getElementById("results-count");
-  if(countEl) countEl.textContent = filtered.length + " \u05e4\u05e8\u05d9\u05d8\u05d9\u05dd";
+  if(countEl) countEl.textContent = filtered.length + " פריטים";
   
   var el = document.getElementById("top15-list");
+  if(!el) return;
   if(!filtered.length){
-    el.innerHTML = '<div class="no-results">\u05dc\u05d0 \u05e0\u05de\u05e6\u05d0\u05d5 \u05e4\u05e8\u05d9\u05d8\u05d9\u05dd</div>';
+    el.innerHTML = '<div class="no-results">לא נמצאו פריטים</div>';
     return;
   }
   var html = "";
   filtered.forEach(function(item,i){
     var val = currentSort==="qty" ? item.qty : item.rev;
     var w = val/maxVal*100;
-    var badge = currentSort==="qty" ? item.qty+" \u05d9\u05d7'" : item.pct+"%";
+    var badge = currentSort==="qty" ? item.qty+' יח'' : item.pct+"%";
     html += '<div class="item-row">';
     html += '<div class="item-rank '+rc(i)+'">'+(i+1)+'</div>';
-    html += '<div class="item-info"><div class="item-name">'+item.name+'</div>'+catTag(item.cat)+'<div class="item-qty">'+item.qty+" \u05d9\u05d7' | "+fmt(item.rev)+'</div></div>';
+    html += '<div class="item-info"><div class="item-name">'+item.name+'</div>'+catTag(item.cat)+'<div class="item-qty">'+item.qty+' יח' | '+fmt(item.rev)+'</div></div>';
     html += '<div style="flex:1;padding:0 10px;"><div class="item-bar"><div class="item-bar-fill" style="width:'+w+'%;background:linear-gradient(90deg,#7c3aed,#c084fc)"></div></div></div>';
-    html += '<div class="item-nums"><div class="item-rev">'+(currentSort==="qty"?item.qty+" \u05d9\u05d7'":fmt(item.rev))+'</div><span class="item-pct-badge">'+badge+'</span></div>';
+    html += '<div class="item-nums"><div class="item-rev">'+(currentSort==="qty"?item.qty+' יח'':fmt(item.rev))+'</div><span class="item-pct-badge">'+badge+'</span></div>';
     html += '</div>';
   });
   el.innerHTML = html;
